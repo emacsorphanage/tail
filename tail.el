@@ -73,11 +73,11 @@ window on the lowest side of the frame."
   (require 'electric)
   ;; Make sure we're not in the minibuffer
   ;; before splitting the window.
-  (if (equal (selected-window) (minibuffer-window))
-      (if (other-window 1)
-	  (select-window (other-window 1))
-	(if (and window-system (other-frame 1))
-	    (select-frame (other-frame 1)))))
+  (cond ((not (equal (selected-window) (minibuffer-window))))
+	((other-window 1)
+	 (select-window (other-window 1)))
+	((and window-system (other-frame 1))
+	 (select-frame (other-frame 1))))
   (let* ((this-buffer (current-buffer))
 	 (this-window (selected-window))
 	 (tail-disp-buf (set-buffer (get-buffer-create tail-buffer))))
@@ -97,19 +97,21 @@ window on the lowest side of the frame."
     (insert tail-msg)
     (read-only-mode 1)
     (shrink-window-if-larger-than-buffer (get-buffer-window tail-disp-buf t))
-    (if (> (window-height (get-buffer-window tail-disp-buf t)) tail-max-size)
-	(shrink-window (- (window-height (get-buffer-window tail-disp-buf t)) tail-max-size)))
+    (when (> (window-height (get-buffer-window tail-disp-buf t)) tail-max-size)
+      (shrink-window (- (window-height (get-buffer-window tail-disp-buf t))
+			tail-max-size)))
     (set-buffer-modified-p nil)
-    (if tail-raise
-	(raise-frame (selected-frame)))
+    (when tail-raise
+      (raise-frame (selected-frame)))
     (select-window this-window)
-    (if tail-audible
-	(beep 1))
-    (if tail-hide-delay
-	(run-with-timer tail-hide-delay nil 'tail-hide-window tail-buffer))))
+    (when tail-audible
+      (beep 1))
+    (when tail-hide-delay
+      (run-with-timer tail-hide-delay nil 'tail-hide-window tail-buffer))))
 
 (defun tail-hide-window (buffer)
-  (delete-window (get-buffer-window buffer t)))	; TODO: cancel timer when some output comes during that time
+  ;; TODO cancel timer when some output comes during that time
+  (delete-window (get-buffer-window buffer t)))
 
 (defun tail-select-lowest-window ()
   "Select the lowest window on the frame."
@@ -119,41 +121,33 @@ window on the lowest side of the frame."
          (window-search t))
     (while window-search
       (let* ((this-window (next-window))
-	     (next-bottom-edge (car (cdr (cdr (cdr
-					       (window-edges this-window)))))))
-	(if (< bottom-edge next-bottom-edge)
-	    (progn
-	      (setq bottom-edge next-bottom-edge)
-	      (setq lowest-window this-window)))
-
+	     (next-bottom-edge (nth 3 (window-edges this-window))))
+	(when (< bottom-edge next-bottom-edge)
+	  (setq bottom-edge next-bottom-edge)
+	  (setq lowest-window this-window))
 	(select-window this-window)
-	(if (eq last-window this-window)
-	    (progn
-	      (select-window lowest-window)
-	      (setq window-search nil)))))))
+	(when (eq last-window this-window)
+	  (select-window lowest-window)
+	  (setq window-search nil))))))
 
 (defun tail-file (file)
   "Tail FILE inside a new buffer.
 FILE cannot be a remote file specified with ange-ftp syntax
 because it is passed to the Unix tail command."
   (interactive "Ftail file: ")
-  (tail-command "tail" "-F" file)) ; TODO: what if file is remote (i.e. via ange-ftp)
+  ;; TODO what if file is remote (i.e. via ange-ftp)
+  (tail-command "tail" "-F" file))
 
 (defun tail-command (command &rest args)
   "Tail COMMAND's output.
 COMMAND is called with ARGS inside a new buffer."
   (interactive "sTail command: \neToto: ")
-  (let ((process
-	 (apply 'start-process-shell-command
-		command
-		(concat "*Tail: "
-			command
-			(if args " " "")
-			(mapconcat 'identity args " ")
-			"*")
-		command
-		args)))
-    (set-process-filter process 'tail-filter)))
+  (set-process-filter
+   (apply 'start-process-shell-command
+	  command
+	  (format "*Tail: %s*" (mapconcat 'identity (cons command args) " "))
+	  args)
+   'tail-filter))
 
 (defun tail-filter (process line)
   "Tail filter called when some output comes."
