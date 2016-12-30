@@ -62,7 +62,6 @@
   :type 'integer
   :group 'tail)
 
-
 ;; Functions
 
 ;; Taken from calendar/appt.el
@@ -70,22 +69,17 @@
   "Display some content specified by ``tail-msg'' inside buffer
 ``tail-msg''.  Create this buffer if necessary and put it inside a
 newly created window on the lowest side of the frame."
-
   (require 'electric)
-
   ;; Make sure we're not in the minibuffer
   ;; before splitting the window.
-
   (if (equal (selected-window) (minibuffer-window))
       (if (other-window 1) 
 	  (select-window (other-window 1))
 	(if (and window-system (other-frame 1))
 	    (select-frame (other-frame 1)))))
-      
   (let* ((this-buffer (current-buffer))
 	 (this-window (selected-window))
 	 (tail-disp-buf (set-buffer (get-buffer-create tail-buffer))))
-
     (if (cdr (assq 'unsplittable (frame-parameters)))
 	;; In an unsplittable frame, use something somewhere else.
 	(display-buffer tail-disp-buf)
@@ -96,7 +90,6 @@ newly created window on the lowest side of the frame."
 	(tail-select-lowest-window)
 	(split-window))
       (pop-to-buffer tail-disp-buf))
-
     (read-only-mode -1)
     (if tail-volatile
 	(erase-buffer))
@@ -114,10 +107,8 @@ newly created window on the lowest side of the frame."
     (if tail-hide-delay
 	(run-with-timer tail-hide-delay nil 'tail-hide-window tail-buffer))))
 
-
 (defun tail-hide-window (buffer)   
   (delete-window (get-buffer-window buffer t)))	; TODO: cancel timer when some output comes during that time
-
 
 (defun tail-select-lowest-window ()
   "Select the lowest window on the frame."
@@ -140,14 +131,12 @@ newly created window on the lowest side of the frame."
 	      (select-window lowest-window)
 	      (setq window-search nil)))))))
 
-
 (defun tail-file (file)
   "Tails file specified with argument ``file'' inside a new buffer.
 ``file'' *cannot* be a remote file specified with ange-ftp syntaxm
 because it is passed to the Unix tail command."
   (interactive "Ftail file: ")
   (tail-command "tail" "-F" file)) ; TODO: what if file is remote (i.e. via ange-ftp)
-  
 
 (defun tail-command (command &rest args)
   "Tails command specified with argument ``command'', with arguments
@@ -164,13 +153,10 @@ because it is passed to the Unix tail command."
 		command 
 		args)))     
     (set-process-filter process 'tail-filter)))
-  
 
 (defun tail-filter (process line)
   "Tail filter called when some output comes."
   (tail-disp-window (process-buffer process) line))
 
-
 (provide 'tail)
-
 ;;; tail.el ends here
