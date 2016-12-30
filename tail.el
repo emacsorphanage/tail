@@ -97,11 +97,11 @@ newly created window on the lowest side of the frame."
 	(split-window))
       (pop-to-buffer tail-disp-buf))
 
-    (toggle-read-only 0)
+    (read-only-mode -1)
     (if tail-volatile
 	(erase-buffer))
     (insert tail-msg)
-    (toggle-read-only 1)
+    (read-only-mode 1)
     (shrink-window-if-larger-than-buffer (get-buffer-window tail-disp-buf t))
     (if (> (window-height (get-buffer-window tail-disp-buf t)) tail-max-size)
 	(shrink-window (- (window-height (get-buffer-window tail-disp-buf t)) tail-max-size)))
