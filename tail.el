@@ -37,27 +37,27 @@
   :prefix "tail-"
   :group 'environment)
 
-(defcustom tail-volatile t 
+(defcustom tail-volatile t
   "Use non-nil to erase previous output"
   :options '(nil t)
   :group 'tail)
 
-(defcustom tail-audible nil 
+(defcustom tail-audible nil
   "Use non-nil to produce a bell when some output is displayed"
   :options '(nil t)
   :group 'tail)
 
-(defcustom tail-raise nil 
+(defcustom tail-raise nil
   "Use non-nil to raise current frame when some output is displayed (could be *very* annoying)"
   :options '(nil t)
   :group 'tail)
 
-(defcustom tail-hide-delay 5 
+(defcustom tail-hide-delay 5
   "Time in seconds before a tail window is deleted"
   :type 'integer
   :group 'tail)
 
-(defcustom tail-max-size 5 
+(defcustom tail-max-size 5
   "Maximum size of the window"
   :type 'integer
   :group 'tail)
@@ -73,7 +73,7 @@ newly created window on the lowest side of the frame."
   ;; Make sure we're not in the minibuffer
   ;; before splitting the window.
   (if (equal (selected-window) (minibuffer-window))
-      (if (other-window 1) 
+      (if (other-window 1)
 	  (select-window (other-window 1))
 	(if (and window-system (other-frame 1))
 	    (select-frame (other-frame 1)))))
@@ -107,7 +107,7 @@ newly created window on the lowest side of the frame."
     (if tail-hide-delay
 	(run-with-timer tail-hide-delay nil 'tail-hide-window tail-buffer))))
 
-(defun tail-hide-window (buffer)   
+(defun tail-hide-window (buffer)
   (delete-window (get-buffer-window buffer t)))	; TODO: cancel timer when some output comes during that time
 
 (defun tail-select-lowest-window ()
@@ -118,7 +118,7 @@ newly created window on the lowest side of the frame."
          (window-search t))
     (while window-search
       (let* ((this-window (next-window))
-	     (next-bottom-edge (car (cdr (cdr (cdr 
+	     (next-bottom-edge (car (cdr (cdr (cdr
 					       (window-edges this-window)))))))
 	(if (< bottom-edge next-bottom-edge)
 	    (progn
@@ -142,16 +142,16 @@ because it is passed to the Unix tail command."
   "Tails command specified with argument ``command'', with arguments
 ``args'' inside a new buffer.  It is also called by tail-file"
   (interactive "sTail command: \neToto: ")
-  (let ((process 
+  (let ((process
 	 (apply 'start-process-shell-command
-		command 
-		(concat "*Tail: " 
-			command 
+		command
+		(concat "*Tail: "
+			command
 			(if args " " "")
-			(mapconcat 'identity args " ") 
+			(mapconcat 'identity args " ")
 			"*")
-		command 
-		args)))     
+		command
+		args)))
     (set-process-filter process 'tail-filter)))
 
 (defun tail-filter (process line)
