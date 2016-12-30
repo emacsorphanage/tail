@@ -22,17 +22,11 @@
 ;; Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 ;; 02111-1307, USA.
 
-;;  $Id: tail.el,v 1.2 2010/10/24 16:23:11 benj Exp $
-
 ;;; Commentary:
 
 ;;  This program displays ``tailed'' contents of files inside
 ;;  transients windows of Emacs.  It is primarily meant to keep an eye
 ;;  on logs within Emacs instead of using additional terminals.
-
-;;  This was developed for GNU Emacs 20.x but should work as well for
-;;  XEmacs 21.x
-
 
 ;;; Code:
 
@@ -106,7 +100,7 @@ newly created window on the lowest side of the frame."
     (toggle-read-only 0)
     (if tail-volatile
 	(erase-buffer))
-    (insert-string tail-msg)
+    (insert tail-msg)
     (toggle-read-only 1)
     (shrink-window-if-larger-than-buffer (get-buffer-window tail-disp-buf t))
     (if (> (window-height (get-buffer-window tail-disp-buf t)) tail-max-size)
