@@ -48,7 +48,8 @@
   :group 'tail)
 
 (defcustom tail-raise nil
-  "Use non-nil to raise current frame when some output is displayed (could be *very* annoying)"
+  "Use non-nil to raise current frame when some output is displayed.
+This could be *very* annoying."
   :options '(nil t)
   :group 'tail)
 
@@ -66,9 +67,9 @@
 
 ;; Taken from calendar/appt.el
 (defun tail-disp-window (tail-buffer tail-msg)
-  "Display some content specified by ``tail-msg'' inside buffer
-``tail-msg''.  Create this buffer if necessary and put it inside a
-newly created window on the lowest side of the frame."
+  "Display some content specified by TAIL-MSG inside TAIL-BUFFER.
+Create this buffer if necessary and put it inside a newly created
+window on the lowest side of the frame."
   (require 'electric)
   ;; Make sure we're not in the minibuffer
   ;; before splitting the window.
@@ -132,15 +133,15 @@ newly created window on the lowest side of the frame."
 	      (setq window-search nil)))))))
 
 (defun tail-file (file)
-  "Tails file specified with argument ``file'' inside a new buffer.
-``file'' *cannot* be a remote file specified with ange-ftp syntaxm
+  "Tail FILE inside a new buffer.
+FILE cannot be a remote file specified with ange-ftp syntax
 because it is passed to the Unix tail command."
   (interactive "Ftail file: ")
   (tail-command "tail" "-F" file)) ; TODO: what if file is remote (i.e. via ange-ftp)
 
 (defun tail-command (command &rest args)
-  "Tails command specified with argument ``command'', with arguments
-``args'' inside a new buffer.  It is also called by tail-file"
+  "Tail COMMAND's output.
+COMMAND is called with ARGS inside a new buffer."
   (interactive "sTail command: \neToto: ")
   (let ((process
 	 (apply 'start-process-shell-command
