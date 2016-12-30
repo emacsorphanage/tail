@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-;;  Custom variables (may be set by the user)
+;;; Options
 
 (defgroup tail nil
   "Tail files or commands into Emacs buffers."
@@ -62,7 +62,7 @@
   :type 'integer
   :group 'tail)
 
-;; Functions
+;;; Functions
 
 ;; Taken from calendar/appt.el
 (defun tail-disp-window (tail-buffer tail-msg)
